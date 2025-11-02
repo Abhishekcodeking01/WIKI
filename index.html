@@ -1,32 +1,31 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Wikipedia</title>
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
   <header>
-    <h1>Wikipedia</h1>
-    <div class="search-box">
+    <h1 id="logo">Wikipedia</h1>
+    <div class="search-area">
       <input type="text" id="searchInput" placeholder="Search Wikipedia..." />
       <button id="searchBtn">Search</button>
     </div>
   </header>
 
   <main>
-    <section id="articleSection">
-      <h2 id="articleTitle">Random Article</h2>
+    <article id="articleSection">
+      <h2 id="articleTitle">Loading article...</h2>
       <img id="articleImage" alt="" />
-      <p id="articleSummary">Type something above to load an article...</p>
-    </section>
+      <p id="articleSummary"></p>
+    </article>
 
     <section id="reviewSection">
       <h3>Reviews</h3>
       <div id="chatBox"></div>
-
-      <div class="chat-input">
+      <div id="chatInput">
         <input type="text" id="messageInput" placeholder="Write your review..." />
         <button id="sendBtn">Post</button>
       </div>
@@ -34,8 +33,12 @@
   </main>
 
   <footer>
-    <p>Wikipedia © | Hidden Review Portal 😉</p>
+    <p>Wikipedia® is a registered trademark of the Wikimedia Foundation, Inc.</p>
   </footer>
+
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js"></script>
 
   <script src="script.js"></script>
 </body>
