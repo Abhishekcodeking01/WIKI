@@ -1,108 +1,147 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Wikipedia</title>
-<style>
-  body {
-    font-family: "Linux Libertine", Georgia, serif;
-    background-color: #f8f9fa;
-    color: #202122;
-    line-height: 1.6;
-    margin: 0;
-    padding: 0;
-  }
-  #content {
-    max-width: 900px;
-    margin: 30px auto;
-    background: #fff;
-    border: 1px solid #a2a9b1;
-    padding: 30px;
-  }
-  h1 {
-    font-size: 2em;
-    border-bottom: 1px solid #a2a9b1;
-    padding-bottom: 8px;
-  }
-  .search-box {
-    margin: 20px auto;
-    text-align: center;
-  }
-  input[type="text"] {
-    width: 60%;
-    padding: 10px;
-    font-size: 1rem;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-  }
-  button {
-    padding: 10px 20px;
-    margin-left: 8px;
-    font-size: 1rem;
-    background-color: #3366cc;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-  }
-  button:hover { background-color: #264e99; }
-
-  #reviews {
-    margin-top: 40px;
-    padding-top: 20px;
-    border-top: 2px solid #ccc;
-    display: none;
-  }
-  .message {
-    padding: 8px;
-    border-bottom: 1px solid #eee;
-  }
-  .sender {
-    font-weight: bold;
-  }
-  #chatbox {
-    margin-top: 15px;
-    display: flex;
-    gap: 10px;
-  }
-  input#messageInput {
-    flex: 1;
-    padding: 10px;
-    font-size: 1rem;
-    border: 1px solid #aaa;
-    border-radius: 4px;
-  }
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Wikipedia</title>
+  <style>
+    body {
+      font-family: "Linux Libertine", Georgia, serif;
+      background-color: #f8f9fa;
+      color: #202122;
+      margin: 0;
+      padding: 0;
+      display: flex;
+    }
+    /* Fake sidebar style */
+    #sidebar {
+      width: 200px;
+      background: #f0f0f0;
+      border-right: 1px solid #a2a9b1;
+      padding: 20px;
+      box-sizing: border-box;
+      height: 100vh;
+      overflow-y: auto;
+    }
+    #sidebar ul {
+      list-style: none;
+      padding: 0;
+    }
+    #sidebar ul li {
+      margin-bottom: 10px;
+    }
+    #sidebar ul li a {
+      color: #0645ad;
+      text-decoration: none;
+    }
+    #sidebar ul li a:hover {
+      text-decoration: underline;
+    }
+    #main {
+      flex: 1;
+      padding: 30px;
+      max-width: 900px;
+      box-sizing: border-box;
+      position: relative;
+    }
+    h1.article-title {
+      font-size: 2em;
+      border-bottom: 1px solid #a2a9b1;
+      padding-bottom: 8px;
+    }
+    .search-box {
+      margin-bottom: 20px;
+      text-align: center;
+    }
+    .search-box input[type="text"] {
+      width: 60%;
+      padding: 10px;
+      font-size: 1rem;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+    .search-box button {
+      padding: 10px 20px;
+      margin-left: 8px;
+      font-size: 1rem;
+      background-color: #3366cc;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    .search-box button:hover {
+      background-color: #264e99;
+    }
+    #articleExtract {
+      white-space: pre-wrap;
+      line-height: 1.6;
+      margin-top: 20px;
+    }
+    #reviews {
+      margin-top: 40px;
+      padding-top: 20px;
+      border-top: 2px solid #ccc;
+      display: none;
+    }
+    #messages .message {
+      padding: 8px;
+      border-bottom: 1px solid #eee;
+    }
+    #messages .sender {
+      font-weight: bold;
+    }
+    #chatbox {
+      margin-top: 15px;
+      display: flex;
+      gap: 10px;
+    }
+    input#messageInput {
+      flex: 1;
+      padding: 10px;
+      font-size: 1rem;
+      border: 1px solid #aaa;
+      border-radius: 4px;
+    }
+  </style>
 </head>
-
 <body>
-  <div class="search-box">
-    <input id="searchInput" placeholder="Search for a topic or enter your code (e.g. Barbie)" />
-    <button id="searchBtn">Search</button>
+  <div id="sidebar">
+    <h3>Navigation</h3>
+    <ul>
+      <li><a href="#">Main page</a></li>
+      <li><a href="#">Contents</a></li>
+      <li><a href="#">Featured topics</a></li>
+      <li><a href="#">Recent changes</a></li>
+      <li><a href="#">Help</a></li>
+    </ul>
   </div>
 
-  <div id="content">
-    <h1 id="articleTitle">Wikipedia Article</h1>
-    <p id="articleExtract">Search for something to begin...</p>
+  <div id="main">
+    <div class="search-box">
+      <input id="searchInput" placeholder="Enter topic or code (e.g. Barbie)" />
+      <button id="searchBtn">Search</button>
+    </div>
 
-    <div id="reviews">
+    <article id="articleSection">
+      <h1 class="article-title" id="articleTitle">Wikipedia Article Title</h1>
+      <div id="articleExtract">Search for something above to begin.</div>
+    </article>
+
+    <section id="reviews">
       <h2>Review Section</h2>
       <div id="messages"></div>
-
       <div id="chatbox">
         <input id="messageInput" placeholder="Type your review..." />
         <button id="sendBtn">Send</button>
       </div>
-    </div>
+    </section>
   </div>
 
   <script type="module">
-    // Firebase imports
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
     import { getDatabase, ref, push, onValue } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
-    // Firebase config
     const firebaseConfig = {
       apiKey: "AIzaSyAPlTJOLRtaK2E-4mpIRSR03nMxdW4awt0",
       authDomain: "wikiwisper112233.firebaseapp.com",
@@ -113,49 +152,65 @@
       appId: "1:107560698063:web:26db514083f6e974b877ba"
     };
 
-    // Initialize Firebase
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
 
-    // Elements
     const searchInput = document.getElementById("searchInput");
     const searchBtn = document.getElementById("searchBtn");
-    const titleEl = document.getElementById("articleTitle");
-    const extractEl = document.getElementById("articleExtract");
+    const articleTitle = document.getElementById("articleTitle");
+    const articleExtract = document.getElementById("articleExtract");
     const reviewsEl = document.getElementById("reviews");
-    const msgInput = document.getElementById("messageInput");
-    const sendBtn = document.getElementById("sendBtn");
     const messagesDiv = document.getElementById("messages");
+    const sendBtn = document.getElementById("sendBtn");
+    const msgInput = document.getElementById("messageInput");
 
     let chatCode = null;
+    let minimized = false;
 
-    // Assign persistent random username per device
+    // Persistent local user
     let localUser = localStorage.getItem("wikiUser");
     if (!localUser) {
-      const randomNames = ["Barbie", "Cinderella", "Rapunzel", "Ironman", "Batman", "Superman", "Thor", "WonderWoman"];
-      localUser = randomNames[Math.floor(Math.random() * randomNames.length)] + "_" + Math.floor(Math.random() * 1000);
+      const names = ["Alfa", "Bravo", "Charlie", "Delta", "Echo", "Foxtrot"];
+      localUser = names[Math.floor(Math.random()*names.length)] + "_" + Math.floor(Math.random()*1000);
       localStorage.setItem("wikiUser", localUser);
     }
 
-    // Function to load Wikipedia content
-    async function loadArticle(query) {
-      const res = await fetch(`https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(query)}`);
+    // Predefined case list for secret code "barbie"
+    const caseList = [
+      "K._M._Nanavati_v._State_of_Maharashtra",
+      "Indira_Gandhi_v._Raj_Narain",
+      "Maneka_Gandhi_v._Union_of_India",
+      "Shah_Bano_Begum_v._Muhammad_Ahmed_Khan",
+      "Kesavananda_Bharati_v._State_of_Kerala",
+      // ... add more links as needed
+    ];
+
+    // Helper to fetch and display article
+    async function loadArticle(query, isSecret=false) {
+      if (isSecret) {
+        // pick random case
+        const pick = caseList[Math.floor(Math.random()*caseList.length)];
+        query = pick;
+      }
+      const url = `https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(query)}`;
+      const res = await fetch(url);
       if (res.ok) {
         const data = await res.json();
-        titleEl.textContent = data.title;
-        extractEl.textContent = data.extract || "No summary available.";
+        articleTitle.textContent = data.title;
+        // Use the extract plus full content simulation (simulate long article)
+        articleExtract.textContent = data.extract + "\n\n" + (data.extract.repeat(5)); // simple repeat to lengthen
       } else {
-        titleEl.textContent = "No results found";
-        extractEl.textContent = "Try another search term.";
+        articleTitle.textContent = "No result";
+        articleExtract.textContent = "Try another search.";
       }
     }
 
-    // Load messages for a chat code
+    // Load chat messages
     function loadMessages(code) {
-      const msgRef = ref(db, "chats/" + code);
-      onValue(msgRef, (snapshot) => {
+      const chatRef = ref(db, "chats/" + code);
+      onValue(chatRef, (snapshot) => {
         messagesDiv.innerHTML = "";
-        snapshot.forEach((child) => {
+        snapshot.forEach(child => {
           const msg = child.val();
           const div = document.createElement("div");
           div.className = "message";
@@ -167,34 +222,55 @@
 
     // Send message
     sendBtn.addEventListener("click", () => {
+      if (!chatCode) return;
       const text = msgInput.value.trim();
-      if (!text || !chatCode) return;
-      const msgRef = ref(db, "chats/" + chatCode);
-      push(msgRef, {
+      if (!text) return;
+      const chatRef = ref(db, "chats/" + chatCode);
+      push(chatRef, {
         user: localUser,
         text: text,
-        timestamp: Date.now(),
+        timestamp: Date.now()
       });
       msgInput.value = "";
     });
 
-    // Handle search / unlock
-    searchBtn.addEventListener("click", async () => {
-      const query = searchInput.value.trim();
-      if (!query) return;
-
-      await loadArticle(query);
-
-      // If it's one of your secret codes → unlock review/chat
-      const secretCodes = ["barbie", "ironman", "cinderella", "batman", "superman"];
-      if (secretCodes.includes(query.toLowerCase())) {
-        chatCode = query.toLowerCase();
+    // Click on article section → collapse review
+    document.getElementById("articleSection").addEventListener("click", () => {
+      if (!minimized && reviewsEl.style.display === "block") {
+        messagesDiv.innerHTML = `<div class="message"><span class="sender">Sam:</span> Great article, very helpful!</div>`;
         reviewsEl.style.display = "block";
-        loadMessages(chatCode);
-      } else {
-        reviewsEl.style.display = "none";
+        msgInput.style.display = "none";
+        sendBtn.style.display = "none";
+        minimized = true;
       }
     });
+
+    // Search button logic
+    searchBtn.addEventListener("click", async () => {
+      const queryRaw = searchInput.value.trim();
+      if (!queryRaw) return;
+      const query = queryRaw.trim();
+
+      // Secret codes
+      const secretCodes = ["barbie", "ironman"];
+      if (secretCodes.includes(query.toLowerCase())) {
+        chatCode = query.toLowerCase();
+        minimized = false;
+        msgInput.style.display = "";
+        sendBtn.style.display = "";
+        reviewsEl.style.display = "block";
+        await loadArticle(query, true);
+        loadMessages(chatCode);
+      } else {
+        chatCode = null;
+        minimized = false;
+        msgInput.style.display = "";
+        sendBtn.style.display = "";
+        reviewsEl.style.display = "none";
+        await loadArticle(query, false);
+      }
+    });
+
   </script>
 </body>
 </html>
