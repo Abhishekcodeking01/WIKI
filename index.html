@@ -102,7 +102,7 @@
     }
 
     #messages {
-      height: 8.5em;
+      height: 8.5em; /* roughly 6 lines */
       overflow-y: auto;
       padding: 0.5em;
       border: 1px solid #ddd;
@@ -146,12 +146,6 @@
       color: #333;
     }
 
-    footer {
-      margin: 2em 0;
-      font-size: 0.8em;
-      color: #888;
-    }
-
     #extra-info {
       display: none;
       max-width: 900px;
@@ -165,6 +159,57 @@
       color: #444;
       text-align: left;
     }
+
+    /* Sections for embeds */
+    .embed-section {
+      width: 90%;
+      max-width: 900px;
+      margin: 2em auto;
+      background: white;
+      border: 1px solid #a2a9b1;
+      border-radius: 6px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+      padding: 1em;
+    }
+
+    .embed-section h3 {
+      margin-top: 0;
+    }
+
+    iframe {
+      width: 100%;
+      border: none;
+      border-radius: 4px;
+      height: 400px;
+    }
+
+    #related-articles {
+      width: 90%;
+      max-width: 900px;
+      margin: 2em auto;
+      background: #ffffff;
+      border: 1px solid #a2a9b1;
+      border-radius: 6px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+      padding: 1em;
+    }
+
+    #quick-facts {
+      width: 90%;
+      max-width: 900px;
+      margin: 2em auto;
+      background: #ffffff;
+      border: 1px solid #a2a9b1;
+      border-radius: 6px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+      padding: 1em;
+    }
+
+    footer {
+      margin: 2em 0;
+      font-size: 0.8em;
+      color: #888;
+    }
   </style>
 </head>
 <body>
@@ -174,7 +219,7 @@
   </header>
 
   <div id="search-box">
-    <input type="text" id="search-input" placeholder="Search Wikipedia...">
+    <input type="text" id="search-input" placeholder="Search Wikipedia..." />
     <button id="search-btn">Search</button>
   </div>
 
@@ -182,6 +227,44 @@
     <h2>Welcome to WikiWisper!</h2>
     <p>Search for any topic above to load the complete Wikipedia article. Scroll down to join discussions with other anonymous users — if you know the secret community pass 🔑.</p>
   </article>
+
+  <!-- Related Articles Section -->
+  <div id="related-articles">
+    <h3>Related Articles / See Also</h3>
+    <ul id="related-list">
+      <li>No topic loaded yet.</li>
+    </ul>
+  </div>
+
+  <!-- Quick Facts Section -->
+  <div id="quick-facts">
+    <h3>Quick Facts</h3>
+    <div id="facts-content">
+      <p>No facts loaded yet.</p>
+    </div>
+  </div>
+
+  <!-- Embedded Sections -->
+  <div class="embed-section" id="embed-brave">
+    <h3>Real Web Search (Brave)</h3>
+    <iframe id="brave-frame" src="about:blank"></iframe>
+  </div>
+
+  <div class="embed-section" id="embed-ai">
+    <h3>AI Search Assistant</h3>
+    <iframe id="ai-frame" src="https://huggingface.co/spaces/INSERT_YOUR_CHOSEN_SPACE_HERE"></iframe>
+  </div>
+
+  <div class="embed-section" id="embed-wolfram">
+    <h3>Wolfram|Alpha Widget</h3>
+    <!-- Example widget embed from Wolfram|Alpha -->
+    <iframe src="https://www.wolframcloud.com/objects/demonstrations/TheFrictionOscillator?_view=EMBED"></iframe>
+  </div>
+
+  <div class="embed-section" id="embed-scholar">
+    <h3>Google Scholar (view-only)</h3>
+    <iframe id="scholar-frame" src="https://scholar.google.com/scholar?q=example"></iframe>
+  </div>
 
   <section id="reviews">
     <h3>Community Chat</h3>
@@ -231,12 +314,19 @@
     const communityInput = document.getElementById('community-input');
     const extraInfo = document.getElementById('extra-info');
 
+    const braveFrame = document.getElementById('brave-frame');
+    const scholarFrame = document.getElementById('scholar-frame');
+
+    const relatedList = document.getElementById('related-list');
+    const factsContent = document.getElementById('facts-content');
+
     const superheroNames = [
       "Ironman", "Wonder Woman", "Catwoman", "Joker",
       "Superman", "Flash", "Mark", "Caption", "Wakanda"
     ];
     const randomUser = superheroNames[Math.floor(Math.random() * superheroNames.length)];
 
+    // Redirect to Wikipedia when logo clicked
     document.getElementById('wiki-logo').onclick = () => {
       window.open('https://www.wikipedia.org', '_blank');
     };
@@ -247,6 +337,17 @@
         if (!res.ok) throw new Error("Article not found");
         const html = await res.text();
         articleContent.innerHTML = html;
+
+        // Related articles & quick facts
+        updateRelated(topic);
+        updateQuickFacts(topic);
+
+        // Update Brave search iframe query
+        braveFrame.src = `https://search.brave.com/search?q=${encodeURIComponent(topic)}`;
+
+        // Update Scholar search iframe query
+        scholarFrame.src = `https://scholar.google.com/scholar?q=${encodeURIComponent(topic)}`;
+
       } catch (err) {
         articleContent.innerHTML = "<p>Sorry, no article found for that topic.</p>";
       }
@@ -258,12 +359,54 @@
       fetchArticle(topic);
     };
 
+    // Related articles via Wikipedia API
+    async function updateRelated(topic) {
+      try {
+        const res = await fetch(`https://en.wikipedia.org/api/rest_v1/page/related/${encodeURIComponent(topic)}`);
+        if (res.ok) {
+          const data = await res.json();
+          relatedList.innerHTML = "";
+          (data.pages || []).slice(0,5).forEach(p => {
+            const li = document.createElement('li');
+            li.innerHTML = `<a href="#" onclick="fetchArticle('${p.title}');return false;">${p.title}</a>`;
+            relatedList.appendChild(li);
+          });
+        }
+      } catch(e) {
+        relatedList.innerHTML = "<li>No related data.</li>";
+      }
+    }
+
+    // Quick facts via Wikidata (simplified example)
+    async function updateQuickFacts(topic) {
+      try {
+        const title = topic.replace(/ /g, '_');
+        const url = `https://www.wikidata.org/w/api.php?action=wbsearchentities&search=${encodeURIComponent(title)}&format=json&origin=*`;
+        const wdRes = await fetch(url);
+        const wdData = await wdRes.json();
+        if (wdData.search && wdData.search.length>0) {
+          const id = wdData.search[0].id;
+          const entityUrl = `https://www.wikidata.org/wiki/Special:EntityData/${id}.json`;
+          const entRes = await fetch(entityUrl);
+          const entJson = await entRes.json();
+          const ent = entJson.entities[id];
+          const label = ent.labels.en ? ent.labels.en.value : title;
+          const description = ent.descriptions.en ? ent.descriptions.en.value : '';
+          factsContent.innerHTML = `<p><strong>${label}</strong>: ${description}</p>`;
+        } else {
+          factsContent.innerHTML = "<p>No facts found.</p>";
+        }
+      } catch(e) {
+        factsContent.innerHTML = "<p>No facts found.</p>";
+      }
+    }
+
     communityInput.addEventListener("change", () => {
       const code = communityInput.value.trim().toLowerCase();
       if (code === "barbie") {
         reviewsSection.style.display = "block";
         extraInfo.style.display = "block";
-        communityInput.value = ""; 
+        communityInput.value = "";
         loadMessages();
       } else {
         reviewsSection.style.display = "none";
@@ -307,6 +450,7 @@
         sendMessage();
       }
     });
+
   </script>
 </body>
 </html>
