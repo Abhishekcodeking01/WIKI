@@ -89,7 +89,6 @@
       border-radius: 4px;
     }
 
-    /* Chat Section */
     #reviews {
       display: none;
       width: 90%;
@@ -100,10 +99,6 @@
       border: 1px solid #dcdcdc;
       margin-bottom: 2em;
       box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-    }
-
-    #reviews h3 {
-      margin-top: 0;
     }
 
     #messages {
@@ -140,7 +135,6 @@
       cursor: pointer;
     }
 
-    /* Plain chat text (no bubble design) */
     .message {
       margin: 3px 0;
       font-size: 0.9em;
@@ -158,7 +152,6 @@
       color: #888;
     }
 
-    /* Info text shown after pass entry */
     #extra-info {
       display: none;
       max-width: 900px;
@@ -205,7 +198,7 @@
   </div>
 
   <div id="extra-info">
-    <p><strong>Note:</strong> WikiWisper is a private experimental project designed for educational and community discussions only. By using the chat, you agree not to share personal data or offensive content. All messages are stored anonymously.</p>
+    <p><strong>Note:</strong> WikiWisper is a private educational project designed for anonymous discussion. Avoid sharing personal or sensitive data.</p>
     <p>Privacy Policy | Terms of Use | Community Guidelines</p>
   </div>
 
@@ -236,7 +229,6 @@
     const sendBtn = document.getElementById('send-btn');
     const reviewsSection = document.getElementById('reviews');
     const communityInput = document.getElementById('community-input');
-    const communityAccess = document.getElementById('community-access');
     const extraInfo = document.getElementById('extra-info');
 
     const superheroNames = [
@@ -250,7 +242,7 @@
       window.open('https://www.wikipedia.org', '_blank');
     };
 
-    // Fetch complete Wikipedia article
+    // Fetch full Wikipedia article
     async function fetchArticle(topic) {
       try {
         const res = await fetch(`https://en.wikipedia.org/api/rest_v1/page/html/${encodeURIComponent(topic)}`);
@@ -268,27 +260,29 @@
       fetchArticle(topic);
     };
 
-    // Community Pass unlocks chat
+    // Unlock chat when correct pass entered
     communityInput.addEventListener("change", () => {
       const code = communityInput.value.trim().toLowerCase();
       if (code === "barbie") {
         reviewsSection.style.display = "block";
-        communityAccess.style.display = "none";
         extraInfo.style.display = "block";
+        communityInput.value = ""; // Clear the text only
         loadMessages();
       } else {
         reviewsSection.style.display = "none";
       }
     });
 
-    // Collapse chat when clicking article
-    articleContent.addEventListener("click", () => {
-      if (reviewsSection.style.display === "block") {
+    // Hide chat if clicked outside chat or pass box
+    document.addEventListener("click", (e) => {
+      const insideChat = reviewsSection.contains(e.target);
+      const insidePass = communityInput.contains(e.target);
+      if (!insideChat && !insidePass) {
         reviewsSection.style.display = "none";
       }
     });
 
-    // Load messages from Firebase
+    // Load messages
     function loadMessages() {
       onValue(ref(db, 'messages'), (snapshot) => {
         messagesDiv.innerHTML = "";
@@ -303,14 +297,22 @@
       });
     }
 
-    // Send chat message
-    sendBtn.onclick = () => {
+    // Send message (via button or Enter key)
+    function sendMessage() {
       const text = chatInput.value.trim();
       if (!text) return;
       push(ref(db, 'messages'), { user: randomUser, text });
       chatInput.value = "";
       chatInput.focus();
-    };
+    }
+
+    sendBtn.onclick = sendMessage;
+    chatInput.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        sendMessage();
+      }
+    });
   </script>
 </body>
 </html>
