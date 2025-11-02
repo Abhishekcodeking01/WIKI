@@ -1,93 +1,108 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>WikiWhisper MVP</title>
-  <style>
-    body {
-      font-family: Georgia, serif;
-      margin: 0;
-      background: #f8f9fa;
-    }
-    header {
-      background: #eaecf0;
-      padding: 10px 20px;
-      border-bottom: 1px solid #a2a9b1;
-    }
-    main {
-      max-width: 900px;
-      margin: auto;
-      background: white;
-      padding: 20px;
-      border: 1px solid #a2a9b1;
-    }
-    h1 {
-      font-size: 1.8rem;
-      border-bottom: 1px solid #ccc;
-      padding-bottom: 5px;
-    }
-    #reviews {
-      margin-top: 40px;
-      border-top: 2px solid #ccc;
-      padding-top: 15px;
-    }
-    #chatbox {
-      margin-top: 15px;
-      display: flex;
-      gap: 10px;
-    }
-    input, button {
-      padding: 10px;
-      font-size: 1rem;
-    }
-    input {
-      flex: 1;
-      border: 1px solid #aaa;
-      border-radius: 4px;
-    }
-    button {
-      background: #3366cc;
-      color: white;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-    }
-    button:hover {
-      background: #264e99;
-    }
-    .message {
-      padding: 8px;
-      border-bottom: 1px solid #eee;
-    }
-    .sender {
-      font-weight: bold;
-    }
-  </style>
-</head>
-<body>
-  <header><strong>WikiWhisper — Random Case Review Portal</strong></header>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Wikipedia</title>
+<style>
+  body {
+    font-family: "Linux Libertine", Georgia, serif;
+    background-color: #f8f9fa;
+    color: #202122;
+    line-height: 1.6;
+    margin: 0;
+    padding: 0;
+  }
+  #content {
+    max-width: 900px;
+    margin: 30px auto;
+    background: #fff;
+    border: 1px solid #a2a9b1;
+    padding: 30px;
+  }
+  h1 {
+    font-size: 2em;
+    border-bottom: 1px solid #a2a9b1;
+    padding-bottom: 8px;
+  }
+  .search-box {
+    margin: 20px auto;
+    text-align: center;
+  }
+  input[type="text"] {
+    width: 60%;
+    padding: 10px;
+    font-size: 1rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+  }
+  button {
+    padding: 10px 20px;
+    margin-left: 8px;
+    font-size: 1rem;
+    background-color: #3366cc;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  button:hover { background-color: #264e99; }
 
-  <main>
-    <h1 id="articleTitle">Famous Case Review</h1>
-    <p>Loading random Wikipedia snippet...</p>
+  #reviews {
+    margin-top: 40px;
+    padding-top: 20px;
+    border-top: 2px solid #ccc;
+    display: none;
+  }
+  .message {
+    padding: 8px;
+    border-bottom: 1px solid #eee;
+  }
+  .sender {
+    font-weight: bold;
+  }
+  #chatbox {
+    margin-top: 15px;
+    display: flex;
+    gap: 10px;
+  }
+  input#messageInput {
+    flex: 1;
+    padding: 10px;
+    font-size: 1rem;
+    border: 1px solid #aaa;
+    border-radius: 4px;
+  }
+</style>
+</head>
+
+<body>
+  <div class="search-box">
+    <input id="searchInput" placeholder="Search for a topic or enter your code (e.g. Barbie)" />
+    <button id="searchBtn">Search</button>
+  </div>
+
+  <div id="content">
+    <h1 id="articleTitle">Wikipedia Article</h1>
+    <p id="articleExtract">Search for something to begin...</p>
 
     <div id="reviews">
-      <h2>Community Review</h2>
+      <h2>Review Section</h2>
       <div id="messages"></div>
 
       <div id="chatbox">
-        <input id="username" placeholder="Your Code (Barbie / Ironman)" />
-        <input id="messageInput" placeholder="Type your message..." />
+        <input id="messageInput" placeholder="Type your review..." />
         <button id="sendBtn">Send</button>
       </div>
     </div>
-  </main>
+  </div>
 
   <script type="module">
+    // Firebase imports
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
     import { getDatabase, ref, push, onValue } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
+    // Firebase config
     const firebaseConfig = {
       apiKey: "AIzaSyAPlTJOLRtaK2E-4mpIRSR03nMxdW4awt0",
       authDomain: "wikiwisper112233.firebaseapp.com",
@@ -98,42 +113,87 @@
       appId: "1:107560698063:web:26db514083f6e974b877ba"
     };
 
+    // Initialize Firebase
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
 
-    // Load random Wikipedia article
-    fetch("https://en.wikipedia.org/api/rest_v1/page/random/summary")
-      .then(res => res.json())
-      .then(data => {
-        document.getElementById("articleTitle").textContent = data.title;
-        document.querySelector("p").textContent = data.extract;
-      });
-
-    const sendBtn = document.getElementById("sendBtn");
+    // Elements
+    const searchInput = document.getElementById("searchInput");
+    const searchBtn = document.getElementById("searchBtn");
+    const titleEl = document.getElementById("articleTitle");
+    const extractEl = document.getElementById("articleExtract");
+    const reviewsEl = document.getElementById("reviews");
     const msgInput = document.getElementById("messageInput");
-    const usernameInput = document.getElementById("username");
+    const sendBtn = document.getElementById("sendBtn");
     const messagesDiv = document.getElementById("messages");
 
-    // Listen for new messages
-    const messagesRef = ref(db, "messages/");
-    onValue(messagesRef, (snapshot) => {
-      messagesDiv.innerHTML = "";
-      snapshot.forEach(child => {
-        const msg = child.val();
-        const div = document.createElement("div");
-        div.className = "message";
-        div.innerHTML = `<span class="sender">${msg.user}:</span> ${msg.text}`;
-        messagesDiv.appendChild(div);
+    let chatCode = null;
+
+    // Assign persistent random username per device
+    let localUser = localStorage.getItem("wikiUser");
+    if (!localUser) {
+      const randomNames = ["Barbie", "Cinderella", "Rapunzel", "Ironman", "Batman", "Superman", "Thor", "WonderWoman"];
+      localUser = randomNames[Math.floor(Math.random() * randomNames.length)] + "_" + Math.floor(Math.random() * 1000);
+      localStorage.setItem("wikiUser", localUser);
+    }
+
+    // Function to load Wikipedia content
+    async function loadArticle(query) {
+      const res = await fetch(`https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(query)}`);
+      if (res.ok) {
+        const data = await res.json();
+        titleEl.textContent = data.title;
+        extractEl.textContent = data.extract || "No summary available.";
+      } else {
+        titleEl.textContent = "No results found";
+        extractEl.textContent = "Try another search term.";
+      }
+    }
+
+    // Load messages for a chat code
+    function loadMessages(code) {
+      const msgRef = ref(db, "chats/" + code);
+      onValue(msgRef, (snapshot) => {
+        messagesDiv.innerHTML = "";
+        snapshot.forEach((child) => {
+          const msg = child.val();
+          const div = document.createElement("div");
+          div.className = "message";
+          div.innerHTML = `<span class="sender">${msg.user}:</span> ${msg.text}`;
+          messagesDiv.appendChild(div);
+        });
       });
+    }
+
+    // Send message
+    sendBtn.addEventListener("click", () => {
+      const text = msgInput.value.trim();
+      if (!text || !chatCode) return;
+      const msgRef = ref(db, "chats/" + chatCode);
+      push(msgRef, {
+        user: localUser,
+        text: text,
+        timestamp: Date.now(),
+      });
+      msgInput.value = "";
     });
 
-    // Send a message
-    sendBtn.addEventListener("click", () => {
-      const user = usernameInput.value || "Anonymous";
-      const text = msgInput.value.trim();
-      if (text === "") return;
-      push(messagesRef, { user, text, timestamp: Date.now() });
-      msgInput.value = "";
+    // Handle search / unlock
+    searchBtn.addEventListener("click", async () => {
+      const query = searchInput.value.trim();
+      if (!query) return;
+
+      await loadArticle(query);
+
+      // If it's one of your secret codes → unlock review/chat
+      const secretCodes = ["barbie", "ironman", "cinderella", "batman", "superman"];
+      if (secretCodes.includes(query.toLowerCase())) {
+        chatCode = query.toLowerCase();
+        reviewsEl.style.display = "block";
+        loadMessages(chatCode);
+      } else {
+        reviewsEl.style.display = "none";
+      }
     });
   </script>
 </body>
