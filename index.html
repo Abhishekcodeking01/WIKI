@@ -79,6 +79,7 @@
       padding: 1em;
       text-align: center;
       font-size: 0.9em;
+      border-radius: 0 0 6px 6px;
     }
 
     #community-input {
@@ -88,23 +89,33 @@
       border-radius: 4px;
     }
 
+    /* Chat Section */
     #reviews {
       display: none;
+      width: 90%;
       max-width: 900px;
       background: #ffffff;
       padding: 1.5em;
       border-radius: 6px;
       border: 1px solid #dcdcdc;
       margin-bottom: 2em;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    }
+
+    #reviews h3 {
+      margin-top: 0;
     }
 
     #messages {
-      max-height: 300px;
+      height: 8.5em; /* roughly 6 lines */
       overflow-y: auto;
-      padding: 1em;
-      border: 1px solid #eee;
+      padding: 0.5em;
+      border: 1px solid #ddd;
       border-radius: 4px;
-      background: #f9f9f9;
+      background: #fff;
+      font-size: 0.9em;
+      line-height: 1.4em;
+      white-space: pre-wrap;
     }
 
     #chat-box {
@@ -129,24 +140,37 @@
       cursor: pointer;
     }
 
+    /* Plain chat text (no bubble design) */
     .message {
-      background: #f1f1f1;
-      padding: 6px 10px;
-      border-radius: 6px;
-      margin: 4px 0;
+      margin: 3px 0;
       font-size: 0.9em;
     }
 
     .username {
       font-weight: bold;
       margin-right: 5px;
-      color: #555;
+      color: #333;
     }
 
     footer {
       margin: 2em 0;
       font-size: 0.8em;
       color: #888;
+    }
+
+    /* Info text shown after pass entry */
+    #extra-info {
+      display: none;
+      max-width: 900px;
+      width: 90%;
+      background: #ffffff;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      padding: 1em;
+      margin-top: 1em;
+      font-size: 0.85em;
+      color: #444;
+      text-align: left;
     }
   </style>
 </head>
@@ -167,7 +191,7 @@
   </article>
 
   <section id="reviews">
-    <h3>Community Reviews</h3>
+    <h3>Community Chat</h3>
     <div id="messages"></div>
     <div id="chat-box">
       <input type="text" id="chat-input" placeholder="Type your message..." />
@@ -178,6 +202,11 @@
   <div id="community-access">
     <label>Community Pass:</label>
     <input type="password" id="community-input" placeholder="Enter code..." />
+  </div>
+
+  <div id="extra-info">
+    <p><strong>Note:</strong> WikiWisper is a private experimental project designed for educational and community discussions only. By using the chat, you agree not to share personal data or offensive content. All messages are stored anonymously.</p>
+    <p>Privacy Policy | Terms of Use | Community Guidelines</p>
   </div>
 
   <footer>WikiWisper © 2025 — inspired by Wikipedia, powered by Firebase.</footer>
@@ -207,8 +236,13 @@
     const sendBtn = document.getElementById('send-btn');
     const reviewsSection = document.getElementById('reviews');
     const communityInput = document.getElementById('community-input');
+    const communityAccess = document.getElementById('community-access');
+    const extraInfo = document.getElementById('extra-info');
 
-    const superheroNames = ["Iron Man", "Batman", "Wonder Woman", "Spider-Man", "Black Panther", "Thor", "Captain Marvel", "Hulk", "Doctor Strange", "Aquaman"];
+    const superheroNames = [
+      "Ironman", "Wonder Woman", "Catwoman", "Joker",
+      "Superman", "Flash", "Mark", "Caption", "Wakanda"
+    ];
     const randomUser = superheroNames[Math.floor(Math.random() * superheroNames.length)];
 
     // Redirect to Wikipedia when logo clicked
@@ -239,6 +273,8 @@
       const code = communityInput.value.trim().toLowerCase();
       if (code === "barbie") {
         reviewsSection.style.display = "block";
+        communityAccess.style.display = "none";
+        extraInfo.style.display = "block";
         loadMessages();
       } else {
         reviewsSection.style.display = "none";
@@ -260,13 +296,14 @@
           const msg = msgSnap.val();
           const div = document.createElement('div');
           div.classList.add('message');
-          div.innerHTML = `<span class='username'>${msg.user}:</span>${msg.text}`;
+          div.innerHTML = `<span class='username'>${msg.user}:</span> ${msg.text}`;
           messagesDiv.appendChild(div);
         });
         messagesDiv.scrollTop = messagesDiv.scrollHeight;
       });
     }
 
+    // Send chat message
     sendBtn.onclick = () => {
       const text = chatInput.value.trim();
       if (!text) return;
