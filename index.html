@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Wikipedia</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <h1>Wikipedia</h1>
+    <div class="search-box">
+      <input type="text" id="searchInput" placeholder="Search Wikipedia..." />
+      <button id="searchBtn">Search</button>
+    </div>
+  </header>
+
+  <main>
+    <section id="articleSection">
+      <h2 id="articleTitle">Random Article</h2>
+      <img id="articleImage" alt="" />
+      <p id="articleSummary">Type something above to load an article...</p>
+    </section>
+
+    <section id="reviewSection">
+      <h3>Reviews</h3>
+      <div id="chatBox"></div>
+
+      <div class="chat-input">
+        <input type="text" id="messageInput" placeholder="Write your review..." />
+        <button id="sendBtn">Post</button>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <p>Wikipedia © | Hidden Review Portal 😉</p>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
