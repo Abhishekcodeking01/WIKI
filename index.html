@@ -46,7 +46,7 @@
     }
 
     #search-input {
-      width: 300px;
+      width: 320px;
       padding: 8px;
       border: 1px solid #a2a9b1;
       border-radius: 4px 0 0 4px;
@@ -71,13 +71,40 @@
       box-shadow: 0 2px 5px rgba(0,0,0,0.05);
     }
 
-    #reviews {
+    #community-access {
       max-width: 900px;
+      width: 90%;
       background: white;
+      border-top: 1px solid #ccc;
+      padding: 1em;
+      text-align: center;
+      font-size: 0.9em;
+    }
+
+    #community-input {
+      padding: 6px;
+      width: 200px;
+      border: 1px solid #aaa;
+      border-radius: 4px;
+    }
+
+    #reviews {
+      display: none;
+      max-width: 900px;
+      background: #ffffff;
       padding: 1.5em;
       border-radius: 6px;
-      border: 1px solid #a2a9b1;
+      border: 1px solid #dcdcdc;
       margin-bottom: 2em;
+    }
+
+    #messages {
+      max-height: 300px;
+      overflow-y: auto;
+      padding: 1em;
+      border: 1px solid #eee;
+      border-radius: 4px;
+      background: #f9f9f9;
     }
 
     #chat-box {
@@ -103,17 +130,23 @@
     }
 
     .message {
-      background: #f0f0f0;
+      background: #f1f1f1;
       padding: 6px 10px;
       border-radius: 6px;
       margin: 4px 0;
+      font-size: 0.9em;
     }
 
-    .minimized {
-      cursor: pointer;
-      color: gray;
-      text-align: center;
-      font-style: italic;
+    .username {
+      font-weight: bold;
+      margin-right: 5px;
+      color: #555;
+    }
+
+    footer {
+      margin: 2em 0;
+      font-size: 0.8em;
+      color: #888;
     }
   </style>
 </head>
@@ -130,7 +163,7 @@
 
   <article id="article-content">
     <h2>Welcome to WikiWisper!</h2>
-    <p>Search for any topic above to load a full Wikipedia article and join discussions below.</p>
+    <p>Search for any topic above to load the complete Wikipedia article. Scroll down to join discussions with other anonymous users — if you know the secret community pass 🔑.</p>
   </article>
 
   <section id="reviews">
@@ -141,6 +174,13 @@
       <button id="send-btn">Send</button>
     </div>
   </section>
+
+  <div id="community-access">
+    <label>Community Pass:</label>
+    <input type="password" id="community-input" placeholder="Enter code..." />
+  </div>
+
+  <footer>WikiWisper © 2025 — inspired by Wikipedia, powered by Firebase.</footer>
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-app.js";
@@ -155,6 +195,7 @@
       messagingSenderId: "107560698063",
       appId: "1:107560698063:web:26db514083f6e974b877ba"
     };
+
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
 
@@ -165,46 +206,67 @@
     const chatInput = document.getElementById('chat-input');
     const sendBtn = document.getElementById('send-btn');
     const reviewsSection = document.getElementById('reviews');
+    const communityInput = document.getElementById('community-input');
 
-    let chatUnlocked = false;
+    const superheroNames = ["Iron Man", "Batman", "Wonder Woman", "Spider-Man", "Black Panther", "Thor", "Captain Marvel", "Hulk", "Doctor Strange", "Aquaman"];
+    const randomUser = superheroNames[Math.floor(Math.random() * superheroNames.length)];
 
-    // Go to Wikipedia if logo clicked
+    // Redirect to Wikipedia when logo clicked
     document.getElementById('wiki-logo').onclick = () => {
       window.open('https://www.wikipedia.org', '_blank');
     };
 
-    // Fetch full Wikipedia article text
+    // Fetch complete Wikipedia article
     async function fetchArticle(topic) {
-      let url = `https://en.wikipedia.org/api/rest_v1/page/html/${encodeURIComponent(topic)}`;
-      const res = await fetch(url);
-      if (!res.ok) {
-        articleContent.innerHTML = "<p>Article not found.</p>";
-        return;
-      }
-      const html = await res.text();
-      articleContent.innerHTML = html;
-
-      // Handle special "barbie" logic
-      if (topic.toLowerCase() === "barbie") {
-        chatUnlocked = true;
-        loadMessages();
-      } else {
-        chatUnlocked = false;
-        minimizeChat();
+      try {
+        const res = await fetch(`https://en.wikipedia.org/api/rest_v1/page/html/${encodeURIComponent(topic)}`);
+        if (!res.ok) throw new Error("Article not found");
+        const html = await res.text();
+        articleContent.innerHTML = html;
+      } catch (err) {
+        articleContent.innerHTML = "<p>Sorry, no article found for that topic.</p>";
       }
     }
 
-    // When clicked anywhere on article, minimize chat
-    articleContent.onclick = () => {
-      if (!chatUnlocked) minimizeChat();
+    searchBtn.onclick = () => {
+      const topic = searchInput.value.trim();
+      if (!topic) return;
+      fetchArticle(topic);
     };
 
-    // Minimize review box
-    function minimizeChat() {
-      reviewsSection.innerHTML = `<div class="minimized">"Great article, very helpful!" – Sam</div>`;
+    // Community Pass unlocks chat
+    communityInput.addEventListener("change", () => {
+      const code = communityInput.value.trim().toLowerCase();
+      if (code === "barbie") {
+        reviewsSection.style.display = "block";
+        loadMessages();
+      } else {
+        reviewsSection.style.display = "none";
+      }
+    });
+
+    // Collapse chat when clicking article
+    articleContent.addEventListener("click", () => {
+      if (reviewsSection.style.display === "block") {
+        reviewsSection.style.display = "none";
+      }
+    });
+
+    // Load messages from Firebase
+    function loadMessages() {
+      onValue(ref(db, 'messages'), (snapshot) => {
+        messagesDiv.innerHTML = "";
+        snapshot.forEach((msgSnap) => {
+          const msg = msgSnap.val();
+          const div = document.createElement('div');
+          div.classList.add('message');
+          div.innerHTML = `<span class='username'>${msg.user}:</span>${msg.text}`;
+          messagesDiv.appendChild(div);
+        });
+        messagesDiv.scrollTop = messagesDiv.scrollHeight;
+      });
     }
 
-    // Send and save chat
     sendBtn.onclick = () => {
       const text = chatInput.value.trim();
       if (!text) return;
@@ -212,44 +274,6 @@
       chatInput.value = "";
       chatInput.focus();
     };
-
-    // Load chat from Firebase
-    function loadMessages() {
-      reviewsSection.innerHTML = `
-        <h3>Community Reviews</h3>
-        <div id="messages"></div>
-        <div id="chat-box">
-          <input type="text" id="chat-input" placeholder="Type your message..." />
-          <button id="send-btn">Send</button>
-        </div>
-      `;
-      const messagesDiv = document.getElementById('messages');
-      const chatInput = document.getElementById('chat-input');
-      const sendBtn = document.getElementById('send-btn');
-
-      onValue(ref(db, 'messages'), (snapshot) => {
-        messagesDiv.innerHTML = "";
-        snapshot.forEach((msgSnap) => {
-          const msg = msgSnap.val();
-          const div = document.createElement('div');
-          div.classList.add('message');
-          div.textContent = `${msg.user}: ${msg.text}`;
-          messagesDiv.appendChild(div);
-        });
-        messagesDiv.scrollTop = messagesDiv.scrollHeight;
-      });
-
-      sendBtn.onclick = () => {
-        const text = chatInput.value.trim();
-        if (!text) return;
-        push(ref(db, 'messages'), { user: randomUser, text });
-        chatInput.value = "";
-        chatInput.focus();
-      };
-    }
-
-    const randomUser = "User" + Math.floor(Math.random() * 1000);
-    searchBtn.onclick = () => fetchArticle(searchInput.value.trim());
   </script>
 </body>
 </html>
