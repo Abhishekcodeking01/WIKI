@@ -102,7 +102,7 @@
     }
 
     #messages {
-      height: 8.5em; /* roughly 6 lines */
+      height: 8.5em;
       overflow-y: auto;
       padding: 0.5em;
       border: 1px solid #ddd;
@@ -193,8 +193,8 @@
   </section>
 
   <div id="community-access">
-    <label>Community Pass:</label>
-    <input type="password" id="community-input" placeholder="Enter code..." />
+    <label>Community:</label>
+    <input type="password" id="community-input" />
   </div>
 
   <div id="extra-info">
@@ -237,12 +237,10 @@
     ];
     const randomUser = superheroNames[Math.floor(Math.random() * superheroNames.length)];
 
-    // Redirect to Wikipedia when logo clicked
     document.getElementById('wiki-logo').onclick = () => {
       window.open('https://www.wikipedia.org', '_blank');
     };
 
-    // Fetch full Wikipedia article
     async function fetchArticle(topic) {
       try {
         const res = await fetch(`https://en.wikipedia.org/api/rest_v1/page/html/${encodeURIComponent(topic)}`);
@@ -260,20 +258,18 @@
       fetchArticle(topic);
     };
 
-    // Unlock chat when correct pass entered
     communityInput.addEventListener("change", () => {
       const code = communityInput.value.trim().toLowerCase();
       if (code === "barbie") {
         reviewsSection.style.display = "block";
         extraInfo.style.display = "block";
-        communityInput.value = ""; // Clear the text only
+        communityInput.value = ""; 
         loadMessages();
       } else {
         reviewsSection.style.display = "none";
       }
     });
 
-    // Hide chat if clicked outside chat or pass box
     document.addEventListener("click", (e) => {
       const insideChat = reviewsSection.contains(e.target);
       const insidePass = communityInput.contains(e.target);
@@ -282,7 +278,6 @@
       }
     });
 
-    // Load messages
     function loadMessages() {
       onValue(ref(db, 'messages'), (snapshot) => {
         messagesDiv.innerHTML = "";
@@ -297,7 +292,6 @@
       });
     }
 
-    // Send message (via button or Enter key)
     function sendMessage() {
       const text = chatInput.value.trim();
       if (!text) return;
