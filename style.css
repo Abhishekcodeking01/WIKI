@@ -1,0 +1,82 @@
+body {
+  font-family: 'Georgia', serif;
+  margin: 0;
+  background-color: #f8f9fa;
+  color: #202122;
+}
+
+header {
+  background-color: #ffffff;
+  border-bottom: 1px solid #a2a9b1;
+  padding: 1em 2em;
+  text-align: center;
+}
+
+.search-box {
+  margin-top: 10px;
+}
+
+input[type="text"] {
+  padding: 8px;
+  width: 250px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+button {
+  padding: 8px 12px;
+  border: none;
+  background-color: #3366cc;
+  color: white;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #254a99;
+}
+
+main {
+  max-width: 800px;
+  margin: 20px auto;
+  padding: 10px;
+  background: #fff;
+  border: 1px solid #ddd;
+}
+
+#articleImage {
+  max-width: 100%;
+  display: block;
+  margin: 1em auto;
+}
+
+#reviewSection {
+  border-top: 2px solid #ccc;
+  margin-top: 2em;
+  padding-top: 1em;
+}
+
+#chatBox {
+  background: #f6f6f6;
+  border: 1px solid #ccc;
+  height: 200px;
+  overflow-y: auto;
+  padding: 10px;
+  margin-bottom: 10px;
+}
+
+.message {
+  padding: 5px 0;
+}
+
+.alias {
+  font-weight: bold;
+  color: #3366cc;
+}
+
+footer {
+  text-align: center;
+  padding: 20px;
+  font-size: 12px;
+  color: #555;
+}
