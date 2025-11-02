@@ -1,276 +1,255 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Wikipedia</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>WikiWisper</title>
+  <link rel="icon" href="https://upload.wikimedia.org/wikipedia/commons/6/63/Wikipedia-logo.png">
   <style>
     body {
       font-family: "Linux Libertine", Georgia, serif;
-      background-color: #f8f9fa;
+      background: #f8f9fa;
       color: #202122;
       margin: 0;
       padding: 0;
       display: flex;
+      flex-direction: column;
+      align-items: center;
     }
-    /* Fake sidebar style */
-    #sidebar {
-      width: 200px;
-      background: #f0f0f0;
-      border-right: 1px solid #a2a9b1;
-      padding: 20px;
-      box-sizing: border-box;
-      height: 100vh;
-      overflow-y: auto;
+
+    header {
+      width: 100%;
+      background: white;
+      padding: 1em;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
     }
-    #sidebar ul {
-      list-style: none;
-      padding: 0;
+
+    header img {
+      height: 40px;
+      cursor: pointer;
     }
-    #sidebar ul li {
-      margin-bottom: 10px;
-    }
-    #sidebar ul li a {
-      color: #0645ad;
-      text-decoration: none;
-    }
-    #sidebar ul li a:hover {
-      text-decoration: underline;
-    }
-    #main {
-      flex: 1;
-      padding: 30px;
-      max-width: 900px;
-      box-sizing: border-box;
-      position: relative;
-    }
-    h1.article-title {
-      font-size: 2em;
-      border-bottom: 1px solid #a2a9b1;
-      padding-bottom: 8px;
-    }
-    .search-box {
-      margin-bottom: 20px;
+
+    h1 {
+      font-size: 1.5em;
+      margin: 0;
+      flex-grow: 1;
       text-align: center;
     }
-    .search-box input[type="text"] {
-      width: 60%;
-      padding: 10px;
-      font-size: 1rem;
+
+    #search-box {
+      margin-top: 2em;
+      display: flex;
+      justify-content: center;
+    }
+
+    #search-input {
+      width: 300px;
+      padding: 8px;
+      border: 1px solid #a2a9b1;
+      border-radius: 4px 0 0 4px;
+    }
+
+    #search-btn {
+      padding: 8px 12px;
+      border: 1px solid #a2a9b1;
+      background: #3366cc;
+      color: white;
+      cursor: pointer;
+      border-radius: 0 4px 4px 0;
+    }
+
+    article {
+      max-width: 900px;
+      padding: 2em;
+      background: white;
+      border: 1px solid #a2a9b1;
+      margin: 2em auto;
+      border-radius: 6px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    }
+
+    #reviews {
+      max-width: 900px;
+      background: white;
+      padding: 1.5em;
+      border-radius: 6px;
+      border: 1px solid #a2a9b1;
+      margin-bottom: 2em;
+    }
+
+    #chat-box {
+      display: flex;
+      margin-top: 1em;
+    }
+
+    #chat-input {
+      flex: 1;
+      padding: 8px;
       border: 1px solid #ccc;
       border-radius: 4px;
     }
-    .search-box button {
-      padding: 10px 20px;
-      margin-left: 8px;
-      font-size: 1rem;
-      background-color: #3366cc;
+
+    #send-btn {
+      margin-left: 10px;
+      background: #36c;
       color: white;
       border: none;
       border-radius: 4px;
+      padding: 8px 12px;
       cursor: pointer;
     }
-    .search-box button:hover {
-      background-color: #264e99;
+
+    .message {
+      background: #f0f0f0;
+      padding: 6px 10px;
+      border-radius: 6px;
+      margin: 4px 0;
     }
-    #articleExtract {
-      white-space: pre-wrap;
-      line-height: 1.6;
-      margin-top: 20px;
-    }
-    #reviews {
-      margin-top: 40px;
-      padding-top: 20px;
-      border-top: 2px solid #ccc;
-      display: none;
-    }
-    #messages .message {
-      padding: 8px;
-      border-bottom: 1px solid #eee;
-    }
-    #messages .sender {
-      font-weight: bold;
-    }
-    #chatbox {
-      margin-top: 15px;
-      display: flex;
-      gap: 10px;
-    }
-    input#messageInput {
-      flex: 1;
-      padding: 10px;
-      font-size: 1rem;
-      border: 1px solid #aaa;
-      border-radius: 4px;
+
+    .minimized {
+      cursor: pointer;
+      color: gray;
+      text-align: center;
+      font-style: italic;
     }
   </style>
 </head>
 <body>
-  <div id="sidebar">
-    <h3>Navigation</h3>
-    <ul>
-      <li><a href="#">Main page</a></li>
-      <li><a href="#">Contents</a></li>
-      <li><a href="#">Featured topics</a></li>
-      <li><a href="#">Recent changes</a></li>
-      <li><a href="#">Help</a></li>
-    </ul>
+  <header>
+    <img src="https://upload.wikimedia.org/wikipedia/commons/6/63/Wikipedia-logo.png" id="wiki-logo" title="Go to Wikipedia" />
+    <h1>WikiWisper</h1>
+  </header>
+
+  <div id="search-box">
+    <input type="text" id="search-input" placeholder="Search Wikipedia...">
+    <button id="search-btn">Search</button>
   </div>
 
-  <div id="main">
-    <div class="search-box">
-      <input id="searchInput" placeholder="Enter topic or code (e.g. Barbie)" />
-      <button id="searchBtn">Search</button>
+  <article id="article-content">
+    <h2>Welcome to WikiWisper!</h2>
+    <p>Search for any topic above to load a full Wikipedia article and join discussions below.</p>
+  </article>
+
+  <section id="reviews">
+    <h3>Community Reviews</h3>
+    <div id="messages"></div>
+    <div id="chat-box">
+      <input type="text" id="chat-input" placeholder="Type your message..." />
+      <button id="send-btn">Send</button>
     </div>
-
-    <article id="articleSection">
-      <h1 class="article-title" id="articleTitle">Wikipedia Article Title</h1>
-      <div id="articleExtract">Search for something above to begin.</div>
-    </article>
-
-    <section id="reviews">
-      <h2>Review Section</h2>
-      <div id="messages"></div>
-      <div id="chatbox">
-        <input id="messageInput" placeholder="Type your review..." />
-        <button id="sendBtn">Send</button>
-      </div>
-    </section>
-  </div>
+  </section>
 
   <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-    import { getDatabase, ref, push, onValue } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-app.js";
+    import { getDatabase, ref, push, onValue } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-database.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyAPlTJOLRtaK2E-4mpIRSR03nMxdW4awt0",
       authDomain: "wikiwisper112233.firebaseapp.com",
       databaseURL: "https://wikiwisper112233-default-rtdb.asia-southeast1.firebasedatabase.app",
       projectId: "wikiwisper112233",
-      storageBucket: "wikiwisper112233.appspot.com",
+      storageBucket: "wikiwisper112233.firebasestorage.app",
       messagingSenderId: "107560698063",
       appId: "1:107560698063:web:26db514083f6e974b877ba"
     };
-
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
 
-    const searchInput = document.getElementById("searchInput");
-    const searchBtn = document.getElementById("searchBtn");
-    const articleTitle = document.getElementById("articleTitle");
-    const articleExtract = document.getElementById("articleExtract");
-    const reviewsEl = document.getElementById("reviews");
-    const messagesDiv = document.getElementById("messages");
-    const sendBtn = document.getElementById("sendBtn");
-    const msgInput = document.getElementById("messageInput");
+    const articleContent = document.getElementById('article-content');
+    const searchInput = document.getElementById('search-input');
+    const searchBtn = document.getElementById('search-btn');
+    const messagesDiv = document.getElementById('messages');
+    const chatInput = document.getElementById('chat-input');
+    const sendBtn = document.getElementById('send-btn');
+    const reviewsSection = document.getElementById('reviews');
 
-    let chatCode = null;
-    let minimized = false;
+    let chatUnlocked = false;
 
-    // Persistent local user
-    let localUser = localStorage.getItem("wikiUser");
-    if (!localUser) {
-      const names = ["Alfa", "Bravo", "Charlie", "Delta", "Echo", "Foxtrot"];
-      localUser = names[Math.floor(Math.random()*names.length)] + "_" + Math.floor(Math.random()*1000);
-      localStorage.setItem("wikiUser", localUser);
-    }
+    // Go to Wikipedia if logo clicked
+    document.getElementById('wiki-logo').onclick = () => {
+      window.open('https://www.wikipedia.org', '_blank');
+    };
 
-    // Predefined case list for secret code "barbie"
-    const caseList = [
-      "K._M._Nanavati_v._State_of_Maharashtra",
-      "Indira_Gandhi_v._Raj_Narain",
-      "Maneka_Gandhi_v._Union_of_India",
-      "Shah_Bano_Begum_v._Muhammad_Ahmed_Khan",
-      "Kesavananda_Bharati_v._State_of_Kerala",
-      // ... add more links as needed
-    ];
-
-    // Helper to fetch and display article
-    async function loadArticle(query, isSecret=false) {
-      if (isSecret) {
-        // pick random case
-        const pick = caseList[Math.floor(Math.random()*caseList.length)];
-        query = pick;
-      }
-      const url = `https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(query)}`;
+    // Fetch full Wikipedia article text
+    async function fetchArticle(topic) {
+      let url = `https://en.wikipedia.org/api/rest_v1/page/html/${encodeURIComponent(topic)}`;
       const res = await fetch(url);
-      if (res.ok) {
-        const data = await res.json();
-        articleTitle.textContent = data.title;
-        // Use the extract plus full content simulation (simulate long article)
-        articleExtract.textContent = data.extract + "\n\n" + (data.extract.repeat(5)); // simple repeat to lengthen
+      if (!res.ok) {
+        articleContent.innerHTML = "<p>Article not found.</p>";
+        return;
+      }
+      const html = await res.text();
+      articleContent.innerHTML = html;
+
+      // Handle special "barbie" logic
+      if (topic.toLowerCase() === "barbie") {
+        chatUnlocked = true;
+        loadMessages();
       } else {
-        articleTitle.textContent = "No result";
-        articleExtract.textContent = "Try another search.";
+        chatUnlocked = false;
+        minimizeChat();
       }
     }
 
-    // Load chat messages
-    function loadMessages(code) {
-      const chatRef = ref(db, "chats/" + code);
-      onValue(chatRef, (snapshot) => {
+    // When clicked anywhere on article, minimize chat
+    articleContent.onclick = () => {
+      if (!chatUnlocked) minimizeChat();
+    };
+
+    // Minimize review box
+    function minimizeChat() {
+      reviewsSection.innerHTML = `<div class="minimized">"Great article, very helpful!" – Sam</div>`;
+    }
+
+    // Send and save chat
+    sendBtn.onclick = () => {
+      const text = chatInput.value.trim();
+      if (!text) return;
+      push(ref(db, 'messages'), { user: randomUser, text });
+      chatInput.value = "";
+      chatInput.focus();
+    };
+
+    // Load chat from Firebase
+    function loadMessages() {
+      reviewsSection.innerHTML = `
+        <h3>Community Reviews</h3>
+        <div id="messages"></div>
+        <div id="chat-box">
+          <input type="text" id="chat-input" placeholder="Type your message..." />
+          <button id="send-btn">Send</button>
+        </div>
+      `;
+      const messagesDiv = document.getElementById('messages');
+      const chatInput = document.getElementById('chat-input');
+      const sendBtn = document.getElementById('send-btn');
+
+      onValue(ref(db, 'messages'), (snapshot) => {
         messagesDiv.innerHTML = "";
-        snapshot.forEach(child => {
-          const msg = child.val();
-          const div = document.createElement("div");
-          div.className = "message";
-          div.innerHTML = `<span class="sender">${msg.user}:</span> ${msg.text}`;
+        snapshot.forEach((msgSnap) => {
+          const msg = msgSnap.val();
+          const div = document.createElement('div');
+          div.classList.add('message');
+          div.textContent = `${msg.user}: ${msg.text}`;
           messagesDiv.appendChild(div);
         });
+        messagesDiv.scrollTop = messagesDiv.scrollHeight;
       });
+
+      sendBtn.onclick = () => {
+        const text = chatInput.value.trim();
+        if (!text) return;
+        push(ref(db, 'messages'), { user: randomUser, text });
+        chatInput.value = "";
+        chatInput.focus();
+      };
     }
 
-    // Send message
-    sendBtn.addEventListener("click", () => {
-      if (!chatCode) return;
-      const text = msgInput.value.trim();
-      if (!text) return;
-      const chatRef = ref(db, "chats/" + chatCode);
-      push(chatRef, {
-        user: localUser,
-        text: text,
-        timestamp: Date.now()
-      });
-      msgInput.value = "";
-    });
-
-    // Click on article section → collapse review
-    document.getElementById("articleSection").addEventListener("click", () => {
-      if (!minimized && reviewsEl.style.display === "block") {
-        messagesDiv.innerHTML = `<div class="message"><span class="sender">Sam:</span> Great article, very helpful!</div>`;
-        reviewsEl.style.display = "block";
-        msgInput.style.display = "none";
-        sendBtn.style.display = "none";
-        minimized = true;
-      }
-    });
-
-    // Search button logic
-    searchBtn.addEventListener("click", async () => {
-      const queryRaw = searchInput.value.trim();
-      if (!queryRaw) return;
-      const query = queryRaw.trim();
-
-      // Secret codes
-      const secretCodes = ["barbie", "ironman"];
-      if (secretCodes.includes(query.toLowerCase())) {
-        chatCode = query.toLowerCase();
-        minimized = false;
-        msgInput.style.display = "";
-        sendBtn.style.display = "";
-        reviewsEl.style.display = "block";
-        await loadArticle(query, true);
-        loadMessages(chatCode);
-      } else {
-        chatCode = null;
-        minimized = false;
-        msgInput.style.display = "";
-        sendBtn.style.display = "";
-        reviewsEl.style.display = "none";
-        await loadArticle(query, false);
-      }
-    });
-
+    const randomUser = "User" + Math.floor(Math.random() * 1000);
+    searchBtn.onclick = () => fetchArticle(searchInput.value.trim());
   </script>
 </body>
 </html>
