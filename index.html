@@ -3,43 +3,38 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Wikipedia</title>
-  <link rel="stylesheet" href="style.css" />
+  <title>WikiWhisper MVP</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      background: linear-gradient(135deg, #1a73e8, #4285f4);
+      color: white;
+      text-align: center;
+    }
+    h1 { font-size: 2.5rem; margin-bottom: 1rem; }
+    p { font-size: 1.2rem; max-width: 500px; }
+    button {
+      background: white;
+      color: #1a73e8;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 8px;
+      font-size: 1rem;
+      margin-top: 20px;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+    button:hover { background: #f1f1f1; }
+  </style>
 </head>
 <body>
-  <header>
-    <h1 id="logo">Wikipedia</h1>
-    <div class="search-area">
-      <input type="text" id="searchInput" placeholder="Search Wikipedia..." />
-      <button id="searchBtn">Search</button>
-    </div>
-  </header>
-
-  <main>
-    <article id="articleSection">
-      <h2 id="articleTitle">Loading article...</h2>
-      <img id="articleImage" alt="" />
-      <p id="articleSummary"></p>
-    </article>
-
-    <section id="reviewSection">
-      <h3>Reviews</h3>
-      <div id="chatBox"></div>
-      <div id="chatInput">
-        <input type="text" id="messageInput" placeholder="Write your review..." />
-        <button id="sendBtn">Post</button>
-      </div>
-    </section>
-  </main>
-
-  <footer>
-    <p>Wikipedia® is a registered trademark of the Wikimedia Foundation, Inc.</p>
-  </footer>
-
-  <!-- Firebase SDKs -->
-  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js"></script>
-
-  <script src="script.js"></script>
+  <h1>🚀 WikiWhisper MVP</h1>
+  <p>Welcome to the first live version of WikiWhisper — your AI-powered knowledge companion!</p>
+  <button onclick="alert('MVP Live! 🚀')">Try Demo</button>
 </body>
 </html>
