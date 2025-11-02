@@ -1,40 +1,140 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>WikiWhisper MVP</title>
   <style>
     body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      height: 100vh;
-      background: linear-gradient(135deg, #1a73e8, #4285f4);
-      color: white;
-      text-align: center;
+      font-family: Georgia, serif;
+      margin: 0;
+      background: #f8f9fa;
     }
-    h1 { font-size: 2.5rem; margin-bottom: 1rem; }
-    p { font-size: 1.2rem; max-width: 500px; }
-    button {
-      background: white;
-      color: #1a73e8;
-      border: none;
+    header {
+      background: #eaecf0;
       padding: 10px 20px;
-      border-radius: 8px;
-      font-size: 1rem;
-      margin-top: 20px;
-      cursor: pointer;
-      transition: 0.2s;
+      border-bottom: 1px solid #a2a9b1;
     }
-    button:hover { background: #f1f1f1; }
+    main {
+      max-width: 900px;
+      margin: auto;
+      background: white;
+      padding: 20px;
+      border: 1px solid #a2a9b1;
+    }
+    h1 {
+      font-size: 1.8rem;
+      border-bottom: 1px solid #ccc;
+      padding-bottom: 5px;
+    }
+    #reviews {
+      margin-top: 40px;
+      border-top: 2px solid #ccc;
+      padding-top: 15px;
+    }
+    #chatbox {
+      margin-top: 15px;
+      display: flex;
+      gap: 10px;
+    }
+    input, button {
+      padding: 10px;
+      font-size: 1rem;
+    }
+    input {
+      flex: 1;
+      border: 1px solid #aaa;
+      border-radius: 4px;
+    }
+    button {
+      background: #3366cc;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #264e99;
+    }
+    .message {
+      padding: 8px;
+      border-bottom: 1px solid #eee;
+    }
+    .sender {
+      font-weight: bold;
+    }
   </style>
 </head>
 <body>
-  <h1>🚀 WikiWhisper MVP</h1>
-  <p>Welcome to the first live version of WikiWhisper — your AI-powered knowledge companion!</p>
-  <button onclick="alert('MVP Live! 🚀')">Try Demo</button>
+  <header><strong>WikiWhisper — Random Case Review Portal</strong></header>
+
+  <main>
+    <h1 id="articleTitle">Famous Case Review</h1>
+    <p>Loading random Wikipedia snippet...</p>
+
+    <div id="reviews">
+      <h2>Community Review</h2>
+      <div id="messages"></div>
+
+      <div id="chatbox">
+        <input id="username" placeholder="Your Code (Barbie / Ironman)" />
+        <input id="messageInput" placeholder="Type your message..." />
+        <button id="sendBtn">Send</button>
+      </div>
+    </div>
+  </main>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import { getDatabase, ref, push, onValue } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyAPlTJOLRtaK2E-4mpIRSR03nMxdW4awt0",
+      authDomain: "wikiwisper112233.firebaseapp.com",
+      databaseURL: "https://wikiwisper112233-default-rtdb.asia-southeast1.firebasedatabase.app",
+      projectId: "wikiwisper112233",
+      storageBucket: "wikiwisper112233.appspot.com",
+      messagingSenderId: "107560698063",
+      appId: "1:107560698063:web:26db514083f6e974b877ba"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+
+    // Load random Wikipedia article
+    fetch("https://en.wikipedia.org/api/rest_v1/page/random/summary")
+      .then(res => res.json())
+      .then(data => {
+        document.getElementById("articleTitle").textContent = data.title;
+        document.querySelector("p").textContent = data.extract;
+      });
+
+    const sendBtn = document.getElementById("sendBtn");
+    const msgInput = document.getElementById("messageInput");
+    const usernameInput = document.getElementById("username");
+    const messagesDiv = document.getElementById("messages");
+
+    // Listen for new messages
+    const messagesRef = ref(db, "messages/");
+    onValue(messagesRef, (snapshot) => {
+      messagesDiv.innerHTML = "";
+      snapshot.forEach(child => {
+        const msg = child.val();
+        const div = document.createElement("div");
+        div.className = "message";
+        div.innerHTML = `<span class="sender">${msg.user}:</span> ${msg.text}`;
+        messagesDiv.appendChild(div);
+      });
+    });
+
+    // Send a message
+    sendBtn.addEventListener("click", () => {
+      const user = usernameInput.value || "Anonymous";
+      const text = msgInput.value.trim();
+      if (text === "") return;
+      push(messagesRef, { user, text, timestamp: Date.now() });
+      msgInput.value = "";
+    });
+  </script>
 </body>
 </html>
