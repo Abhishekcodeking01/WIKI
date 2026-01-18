@@ -25,6 +25,7 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
+      box-sizing: border-box;
     }
 
     header img {
@@ -43,10 +44,13 @@
       margin-top: 2em;
       display: flex;
       justify-content: center;
+      width: 100%;
+      box-sizing: border-box;
     }
 
     #search-input {
       width: 320px;
+      max-width: 60%;
       padding: 8px;
       border: 1px solid #a2a9b1;
       border-radius: 4px 0 0 4px;
@@ -63,12 +67,14 @@
 
     article {
       max-width: 900px;
+      width: 90%;
       padding: 2em;
       background: white;
       border: 1px solid #a2a9b1;
       margin: 2em auto;
       border-radius: 6px;
       box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+      box-sizing: border-box;
     }
 
     #community-access {
@@ -80,6 +86,8 @@
       text-align: center;
       font-size: 0.9em;
       border-radius: 0 0 6px 6px;
+      box-sizing: border-box;
+      margin-bottom: 20px;
     }
 
     #community-input {
@@ -89,6 +97,7 @@
       border-radius: 4px;
     }
 
+    /* Chat Room Styling */
     #reviews {
       display: none;
       width: 90%;
@@ -99,51 +108,70 @@
       border: 1px solid #dcdcdc;
       margin-bottom: 2em;
       box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+      box-sizing: border-box;
+    }
+    
+    #room-title {
+        margin-top: 0;
+        color: #3366cc;
+        font-size: 1.2em;
+        border-bottom: 1px solid #eee;
+        padding-bottom: 10px;
+        margin-bottom: 10px;
     }
 
     #messages {
-      height: 8.5em; /* roughly 6 lines */
+      height: 300px;
       overflow-y: auto;
-      padding: 0.5em;
+      padding: 1em;
       border: 1px solid #ddd;
       border-radius: 4px;
-      background: #fff;
-      font-size: 0.9em;
-      line-height: 1.4em;
-      white-space: pre-wrap;
+      background: #fafafa;
+      font-size: 0.95em;
+      line-height: 1.5em;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
     }
 
     #chat-box {
       display: flex;
       margin-top: 1em;
+      gap: 10px;
     }
 
     #chat-input {
       flex: 1;
-      padding: 8px;
+      padding: 10px;
       border: 1px solid #ccc;
       border-radius: 4px;
     }
 
     #send-btn {
-      margin-left: 10px;
       background: #36c;
       color: white;
       border: none;
       border-radius: 4px;
-      padding: 8px 12px;
+      padding: 8px 20px;
       cursor: pointer;
+      font-weight: bold;
+    }
+    
+    #send-btn:hover {
+        background: #2a4b8d;
     }
 
     .message {
-      margin: 3px 0;
-      font-size: 0.9em;
+      padding: 5px 8px;
+      background: white;
+      border-radius: 4px;
+      border-bottom: 1px solid #eee;
     }
 
     .username {
       font-weight: bold;
       margin-right: 5px;
-      color: #333;
+      color: #3366cc;
     }
 
     #extra-info {
@@ -158,6 +186,7 @@
       font-size: 0.85em;
       color: #444;
       text-align: left;
+      box-sizing: border-box;
     }
 
     /* Sections for embeds */
@@ -170,6 +199,7 @@
       border-radius: 6px;
       box-shadow: 0 2px 5px rgba(0,0,0,0.05);
       padding: 1em;
+      box-sizing: border-box;
     }
 
     .embed-section h3 {
@@ -192,6 +222,7 @@
       border-radius: 6px;
       box-shadow: 0 2px 5px rgba(0,0,0,0.05);
       padding: 1em;
+      box-sizing: border-box;
     }
 
     #quick-facts {
@@ -203,6 +234,7 @@
       border-radius: 6px;
       box-shadow: 0 2px 5px rgba(0,0,0,0.05);
       padding: 1em;
+      box-sizing: border-box;
     }
 
     footer {
@@ -267,7 +299,7 @@
   </div>
 
   <section id="reviews">
-    <h3>Community Chat</h3>
+    <h3 id="room-title">Community Chat</h3>
     <div id="messages"></div>
     <div id="chat-box">
       <input type="text" id="chat-input" placeholder="Type your message..." />
@@ -276,8 +308,8 @@
   </section>
 
   <div id="community-access">
-    <label>Community:</label>
-    <input type="password" id="community-input" />
+    <label>Community Code:</label>
+    <input type="password" id="community-input" placeholder="Enter code..." />
   </div>
 
   <div id="extra-info">
@@ -288,8 +320,17 @@
   <footer>WikiWisper © 2025 — inspired by Wikipedia, powered by Firebase.</footer>
 
   <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-app.js";
-    import { getDatabase, ref, push, onValue } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-database.js";
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js";
+    import { getDatabase, ref, push, onValue, off } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-database.js";
+    import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-auth.js";
+
+    // --- CONFIGURATION: ADD NEW ROOMS HERE ---
+    // Format: "password": "database_collection_name"
+    const chatRooms = {
+      "barbie": "messages",       // ORIGINAL Room (Preserves old data)
+      "reeth": "messages_reeth"   // NEW Room (Separate chat)
+    };
+    // -----------------------------------------
 
     const firebaseConfig = {
       apiKey: "AIzaSyAPlTJOLRtaK2E-4mpIRSR03nMxdW4awt0",
@@ -303,6 +344,12 @@
 
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
+    const auth = getAuth(app);
+
+    // Authenticate anonymously
+    signInAnonymously(auth).catch((error) => {
+        console.error("Auth Error:", error);
+    });
 
     const articleContent = document.getElementById('article-content');
     const searchInput = document.getElementById('search-input');
@@ -313,6 +360,7 @@
     const reviewsSection = document.getElementById('reviews');
     const communityInput = document.getElementById('community-input');
     const extraInfo = document.getElementById('extra-info');
+    const roomTitle = document.getElementById('room-title');
 
     const braveFrame = document.getElementById('brave-frame');
     const scholarFrame = document.getElementById('scholar-frame');
@@ -322,9 +370,13 @@
 
     const superheroNames = [
       "Ironman", "Wonder Woman", "Catwoman", "Joker",
-      "Superman", "Flash", "Mark", "Caption", "Wakanda"
+      "Superman", "Flash", "Mark", "Captain", "Wakanda", "Spider-Gwen"
     ];
-    const randomUser = superheroNames[Math.floor(Math.random() * superheroNames.length)];
+    let randomUser = superheroNames[Math.floor(Math.random() * superheroNames.length)];
+
+    // State for current chat room
+    let currentRoomPath = null;
+    let currentRoomName = null;
 
     // Redirect to Wikipedia when logo clicked
     document.getElementById('wiki-logo').onclick = () => {
@@ -377,7 +429,7 @@
       }
     }
 
-    // Quick facts via Wikidata (simplified example)
+    // Quick facts via Wikidata
     async function updateQuickFacts(topic) {
       try {
         const title = topic.replace(/ /g, '_');
@@ -401,29 +453,56 @@
       }
     }
 
-    communityInput.addEventListener("change", () => {
+    // --- UPDATED ROOM LOGIC ---
+    communityInput.addEventListener("input", () => {
       const code = communityInput.value.trim().toLowerCase();
-      if (code === "barbie") {
+      
+      // Check if the code entered exists in our valid chatRooms list
+      if (chatRooms[code]) {
+        // If switching to a new room, we should turn off the listener for the old room if needed
+        if (currentRoomPath && currentRoomPath !== chatRooms[code]) {
+             off(ref(db, currentRoomPath));
+        }
+
+        currentRoomPath = chatRooms[code];
+        currentRoomName = code.charAt(0).toUpperCase() + code.slice(1); // Capitalize first letter
+        
+        // UI Updates
+        roomTitle.textContent = `${currentRoomName} Community Chat`;
         reviewsSection.style.display = "block";
         extraInfo.style.display = "block";
-        communityInput.value = "";
-        loadMessages();
-      } else {
-        reviewsSection.style.display = "none";
+        
+        // Clear the input so it feels like a secret access
+        communityInput.value = ""; 
+
+        // Load the specific messages for this room
+        loadMessages(currentRoomPath);
       }
     });
 
+    // --- LOGIC RESTORED: Hide chat when clicking outside ---
     document.addEventListener("click", (e) => {
       const insideChat = reviewsSection.contains(e.target);
       const insidePass = communityInput.contains(e.target);
+      
+      // Only hide if we click OUTSIDE the chat box AND OUTSIDE the password input
       if (!insideChat && !insidePass) {
-        reviewsSection.style.display = "none";
+         reviewsSection.style.display = "none";
+         // We do not hide extraInfo here to keep policy links visible, 
+         // but if you want that hidden too, add: extraInfo.style.display = "none";
       }
     });
 
-    function loadMessages() {
-      onValue(ref(db, 'messages'), (snapshot) => {
+    function loadMessages(dbPath) {
+      messagesDiv.innerHTML = "<div style='color:gray; padding:10px;'>Loading chat...</div>";
+      
+      onValue(ref(db, dbPath), (snapshot) => {
         messagesDiv.innerHTML = "";
+        if (!snapshot.exists()) {
+            messagesDiv.innerHTML = "<div style='color:gray; padding:10px;'>No messages yet. Say hello!</div>";
+            return;
+        }
+        
         snapshot.forEach((msgSnap) => {
           const msg = msgSnap.val();
           const div = document.createElement('div');
@@ -438,7 +517,12 @@
     function sendMessage() {
       const text = chatInput.value.trim();
       if (!text) return;
-      push(ref(db, 'messages'), { user: randomUser, text });
+      if (!currentRoomPath) {
+          alert("Please enter a valid community code first!");
+          return;
+      }
+
+      push(ref(db, currentRoomPath), { user: randomUser, text });
       chatInput.value = "";
       chatInput.focus();
     }
